@@ -1,18 +1,5 @@
-import json
-
 from agent import Agent
-
-
-def get_weather(location, time="now"):
-    """Return weather information for a location and time."""
-    return json.dumps(
-        {
-            "location": location,
-            "temperature": "65",
-            "condition": "Sunny",
-            "time": time,
-        }
-    )
+from weather import get_weather
 
 
 def process_refund(item_id, reason="NOT SPECIFIED"):
