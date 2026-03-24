@@ -1,4 +1,5 @@
 from agent import Agent
+from email_tools import send_email
 from weather import get_weather
 
 
@@ -14,8 +15,13 @@ def apply_discount():
 
 weather_agent = Agent(
     name="Weather Agent",
-    instructions="You are a helpful agent for giving information on weather.",
-    functions=[get_weather],
+    instructions=(
+        "You are a helpful weather assistant. "
+        "Use get_weather whenever weather data is needed. "
+        "If the user asks to email weather details, first get the weather and then call send_email "
+        "with a clear subject and a complete weather summary in the email body."
+    ),
+    functions=[get_weather, send_email],
 )
 
 triage_agent = Agent(

@@ -1,9 +1,6 @@
 from agent import pretty_print_messages, Agent, Swarm
+from email_tools import send_email
 from weather import get_weather
-
-        
-def send_email(recipient, subject, body):
-    return f"Sent! email to {recipient} with the subject: {subject} and body: {body}"
 
 
 weather_agent = Agent(
