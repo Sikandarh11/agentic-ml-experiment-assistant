@@ -1,16 +1,6 @@
-from dotenv import load_dotenv
-_ = load_dotenv()
-
-import json
 from agent import pretty_print_messages, Agent, Swarm
-
-
-def get_weather(location, time="now"):
-    return json.dumps({"location": location, "temperature": "65", "time": time})
-
-
-def send_email(recipient, subject, body):
-    return f"Sent! email to {recipient} with the subject: {subject} and body: {body}"
+from email_tools import send_email
+from weather import get_weather
 
 
 weather_agent = Agent(
