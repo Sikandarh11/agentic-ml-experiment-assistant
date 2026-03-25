@@ -1,4 +1,5 @@
 from typing import Any, Dict, List
+import os
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
@@ -12,13 +13,17 @@ _ = load_dotenv()
 
 app = FastAPI(title="Agent Studio Backend")
 
+default_origins = [
+    "http://localhost:8080",
+    "http://localhost:5173",
+    "http://localhost:4173",
+]
+env_origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "").split(",") if origin.strip()]
+allowed_origins = env_origins or default_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:8080",
-        "http://localhost:5173",
-        "http://localhost:4173",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
