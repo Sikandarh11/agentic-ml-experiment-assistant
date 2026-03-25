@@ -19,7 +19,7 @@ interface BackendChatResponse {
   }>;
 }
 
-const API_BASE = (import.meta as ImportMeta & { env?: Record<string, string> }).env?.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE = (import.meta as ImportMeta & { env?: Record<string, string> }).env?.VITE_API_BASE_URL || 'https://backend-server-single-multiagent-u7.vercel.app';
 
 function toBackendMessages(messages: ChatMessage[]): BackendMessage[] {
   return messages
