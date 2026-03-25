@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { ChatMessage, ChatSession, AgentMode } from '@/types/agent';
-import { runMockAgent, getInitialAgent } from '@/lib/mock-agent';
 import { runBackendAgent } from '@/lib/agent-api';
 import { ChatBubble } from '@/components/ChatBubble';
 import { AgentGraph } from '@/components/AgentGraph';
@@ -8,6 +7,10 @@ import { TracePanel } from '@/components/TracePanel';
 import { Button } from '@/components/ui/button';
 import { Send, Trash2, Download, Plus, Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
+
+function getInitialAgent(mode: AgentMode): string {
+  return mode === 'single' ? 'Weather Agent' : 'Triage Agent';
+}
 
 function newSession(mode: AgentMode): ChatSession {
   return {
@@ -28,7 +31,7 @@ export default function StudioPage() {
   const [session, setSession] = useState<ChatSession>(() => newSession('single'));
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [usingFallback, setUsingFallback] = useState(false);
+  const [backendError, setBackendError] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -53,11 +56,10 @@ export default function StudioPage() {
     };
 
     const outboundMessages = [...session.messages, userMsg];
-    const currentAgent = session.activeAgent;
-
     setSession(prev => ({ ...prev, messages: [...prev.messages, userMsg] }));
     setInput('');
     setIsTyping(true);
+    setBackendError(null);
 
     try {
       const result = await runBackendAgent(mode, outboundMessages, 6);
@@ -66,15 +68,22 @@ export default function StudioPage() {
         messages: [...prev.messages, ...withoutToolMessages(result.messages)],
         activeAgent: result.activeAgent,
       }));
-      setUsingFallback(false);
-    } catch {
-      const result = runMockAgent(mode, text, currentAgent);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown backend error';
+      setBackendError(message);
       setSession(prev => ({
         ...prev,
-        messages: [...prev.messages, ...withoutToolMessages(result.messages)],
-        activeAgent: result.activeAgent,
+        messages: [
+          ...prev.messages,
+          {
+            id: `msg-${Date.now()}-backend-error`,
+            role: 'assistant',
+            sender: 'System',
+            content: 'Backend is unavailable right now. Please check server status and try again.',
+            ts: Date.now(),
+          },
+        ],
       }));
-      setUsingFallback(true);
     } finally {
       setIsTyping(false);
     }
@@ -104,9 +113,9 @@ export default function StudioPage() {
         <div className="flex items-center gap-3">
           <a href="/" className="text-neon font-mono font-bold text-sm hover:opacity-80 transition">← Back</a>
           <span className="text-muted-foreground text-xs font-mono">/ demo studio</span>
-          {usingFallback && (
+          {backendError && (
             <span className="text-[10px] font-mono text-amber-400 border border-amber-500/40 px-2 py-0.5 rounded">
-              mock fallback
+              backend unavailable
             </span>
           )}
         </div>
