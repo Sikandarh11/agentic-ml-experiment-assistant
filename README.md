@@ -1,3 +1,11 @@
-# Welcome to your Lovable project
+---
+title: Sikandar Agent 1
+emoji: 📊
+colorFrom: blue
+colorTo: gray
+sdk: docker
+pinned: false
+license: openrail
+---
 
-TODO: Document your project here
+Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
